@@ -3,7 +3,7 @@
 	GD50 2023
 	Pong Remake
 
-	pong-2
+	pong-3
 	"The Paddle Update"
 
 	-- Main Program --
