@@ -3,8 +3,8 @@
 	GD50 2023
 	Pong Remake
 
-	pong-7
-	"The Collision Update"
+	pong-8
+	"The Score Update"
 
 	-- Main Program --
 
@@ -109,8 +109,7 @@ end
 function love.update(dt)
     if gameState == 'play' then
         -- detect ball collision with paddles, reversing dx if true and
-        -- slightly increasing it, then altering the dy based on the position
-        -- of collision
+        -- slightly increasing it, then altering the dy based on the position of collision
         if ball:collides(player1) then
             ball.dx = -ball.dx * 1.03
             ball.x = player1.x + 5
@@ -134,8 +133,7 @@ function love.update(dt)
             end
         end
 
-        -- detect upper and lower screen boundary collision and reverse if
-        -- collided
+        -- detect upper and lower screen boundary collision and reverse if collided
         if ball.y <= 0 then
             ball.y = 0
             ball.dy = -ball.dy
@@ -146,6 +144,22 @@ function love.update(dt)
             ball.y = VIRTUAL_HEIGHT - 4
             ball.dy = -ball.dy
         end
+    end
+
+    -- if we reach the left or right edge of the screen,
+    -- go back to start and update the score
+    if ball.x < 0 then
+        servingPlayer = 1
+        player2Score = player2Score + 1
+        ball:reset()
+        gameState = 'start'
+    end
+
+    if ball.x > VIRTUAL_WIDTH then
+        servingPlayer = 2
+        player1Score = player1Score + 1
+        ball:reset()
+        gameState = 'start'
     end
 
     -- player 1 movement
@@ -213,12 +227,6 @@ function love.draw()
 
   -- draw welcome text toward the top of the screen
   love.graphics.setFont(smallFont)
-
-  if gameState == 'start' then
-    love.graphics.printf('Hello Start State!', 0, 20, VIRTUAL_WIDTH, 'center')
-  else
-    love.graphics.printf('Hello Play State', 0, 20, VIRTUAL_WIDTH, 'center')
-  end
 
   -- draw score on the left and right center of the screen
   -- need to switch font to draw before actually printing
