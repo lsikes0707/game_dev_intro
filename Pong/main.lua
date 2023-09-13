@@ -3,8 +3,8 @@
 	GD50 2023
 	Pong Remake
 
-	pong-5
-	"The Class Update"
+	pong-6
+	"The FPS Update"
 
 	-- Main Program --
 
@@ -55,7 +55,13 @@ PADDLE_SPEED = 200
 	Runs when the game first starts up, only once; used to start the game
 ]]
 function love.load()
+    -- set love's defailt filter to "nearest-nearest", which essentially
+    -- means there will be no filtering of pixels (blurriness), which is
+    -- important for a nice crisp 2D look
  	love.graphics.setDefaultFilter('nearest', 'nearest')
+
+    -- set the title of our application window
+    love.window.setTitle('Pong')
 
     -- "seed" the RNG so that calls to random are always random
     -- use the current time, since that will vary on startup everytime
@@ -63,6 +69,9 @@ function love.load()
 
     -- more "retro-looking" font object we can use for any text
     smallFont = love.graphics.newFont('font.ttf', 8)
+
+    -- larger font for drawing the score on the screen
+    scoreFont = love.graphics.newFont('font.ttf', 32)
 
     -- set LOVE2D's active font to the smallFont object
     love.graphics.setFont(smallFont)
@@ -73,6 +82,11 @@ function love.load()
           resizable = false,
           vsync = true
       })
+
+      -- initial score variables, used for rendering on the screen and keeping
+      -- track of the winner
+      player1Score = 0
+      player2Score = 0
 
       -- initialize our player paddles; make them global so that they can be
       -- detected by other functions and modules
@@ -165,6 +179,14 @@ function love.draw()
     love.graphics.printf('Hello Play State', 0, 20, VIRTUAL_WIDTH, 'center')
   end
 
+  -- draw score on the left and right center of the screen
+  -- need to switch font to draw before actually printing
+  love.graphics.setFont(scoreFont)
+  love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50,
+  VIRTUAL_HEIGHT / 3)
+  love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 30,
+  VIRTUAL_HEIGHT / 3)
+
   -- render paddles, now using their class's render method
   player1:render()
   player2:render()
@@ -172,6 +194,19 @@ function love.draw()
   -- render ball using its class's render method
   ball:render()
 
+  -- new function just to demonstrate how to see FPS in LOVE3D
+  displayFPS()
+
   -- end rendering at virtual resolution
   push:apply('end')
+end
+
+--[[
+    Renders the current FPS
+]]
+function displayFPS()
+    -- simple FPS display across all states
+    love.graphics.setFont(smallFont)
+    love.graphics.setColor(255/255, 0, 255/255, 255/255)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
 end
