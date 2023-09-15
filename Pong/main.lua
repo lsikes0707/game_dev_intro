@@ -87,11 +87,14 @@ function love.load()
           resizable = true,
           vsync = true
       })
-
+--[[
       -- initial score variables, used for rendering on the screen and keeping
       -- track of the winner
       player1Score = 0
       player2Score = 0
+]]
+      -- initial score variable
+      playerScore = 0
 
       -- either going to be 1 or 2; whomever is scored on gets to serve
       -- the following turn
@@ -142,6 +145,13 @@ function love.update(dt)
             end
 
             sounds['paddle_hit']:play()
+            playerScore = playerScore + 1
+
+            -- if players vollied to 26 - they win!
+            if playerScore == 26 then
+                gameState = 'done'
+                ball:reset()
+            end
         end
         if ball:collides(player2) then
             ball.dx = -ball.dx * 1.03
@@ -155,6 +165,12 @@ function love.update(dt)
             end
 
             sounds['paddle_hit']:play()
+            playerScore = playerScore + 1
+            -- if players vollied to 26 - they win!
+            if playerScore == 26 then
+                gameState = 'done'
+                ball:reset()
+            end
         end
 
         -- detect upper and lower screen boundary collision and reverse if collided
@@ -175,34 +191,49 @@ function love.update(dt)
         -- go back to start and update the score
         if ball.x < 0 then
             servingPlayer = 1
-            player2Score = player2Score + 1
+            -- player2Score = player2Score + 1
             sounds['score']:play()
+
+            gameState = 'serve'
+            ball:reset()
+            playerScore = 0
 
             -- if we've reached a score of 10, the game is over; set the
             -- state to done so we can show the victory message
-            if player2Score == 10 then
-                winningPlayer = 2
-                gameState = 'done'
-            else
-                gameState = 'serve'
+--            if player2Score == 10 then
+--                winningPlayer = 2
+--                gameState = 'done'
+--            else
+--                gameState = 'serve'
                 -- place the ball in the middle of the screen, no velocity
-                ball:reset()
-            end
+--                ball:reset()
+--         end
+
+
         end
 
         if ball.x > VIRTUAL_WIDTH then
             servingPlayer = 2
-            player1Score = player1Score + 1
+           -- player1Score = player1Score + 1
             sounds['score']:play()
 
-            if player1Score == 10 then
-                winningPlayer = 1
-                gameState = 'done'
-            else
-                gameState = 'serve'
-                ball:reset()
-            end
+            gameState = 'serve'
+            ball:reset()
+            playerScore = 0
+            
+--            if player1Score == 10 then
+--                winningPlayer = 1
+--                gameState = 'done'
+--            else
+--                gameState = 'serve'
+--                ball:reset()
+--            end
         end
+
+--[[        -- if players vollied to 26 - they win!
+        if playerScore == 6 then
+            gameState = 'done'
+        end]]
     end
 
     -- player 1 movement
@@ -248,7 +279,7 @@ function love.keypressed(key)
         gameState = 'serve'
     elseif gameState == 'serve' then
         gameState = 'play'
-    elseif gameState == 'done' then
+    elseif gameState == 'done' or gameState == 'lost' then
         -- game is simply in a restart phase here, but will set the serving
         -- player to the opponent of whomever won for fairness!
         gameState = 'serve'
@@ -256,8 +287,9 @@ function love.keypressed(key)
         ball:reset()
 
         -- reset scores to 0
-        player1Score = 0
-        player2Score = 0
+--        player1Score = 0
+--        player2Score = 0
+        playerScore = 0
 
         -- decide serving player as the opposite of who won
         if winningPlayer == 1 then
@@ -296,13 +328,17 @@ function love.draw()
     love.graphics.printf('Press Enter to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
   elseif gameState == 'play' then
     -- no UI message to siplay in play state
-  elseif gameState == 'done' then
+  elseif gameState == 'lost' then -- changed 'done to 'lost'
     -- UI messages
     love.graphics.setFont(largeFont)
-    love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!',
-        0, 10, VIRTUAL_WIDTH, 'center')
+--    love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!',
+--        0, 10, VIRTUAL_WIDTH, 'center') -- for old 'done'
+    love.graphics.printf('You lost! Better luck next time!', 0, 10, VIRTUAL_WIDTH, 'center')
     love.graphics.setFont(smallFont)
     love.graphics.printf('Press Enter to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+  elseif gameState == 'done' then
+    love.graphics.setFont(largeFont)
+    love.graphics.printf('You won! Great job players!', 0, 10, VIRTUAL_WIDTH, 'center')
   end
 
   player1:render()
@@ -327,12 +363,22 @@ end
 --[[
     Simply draws the score to the screen.
 ]]
-function displayScore()
+function originalDdisplayScore()
     -- draw score on the left and right center of the screen
     -- need to switch font to draw before actually printing
     love.graphics.setFont(scoreFont)
     love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50,
         VIRTUAL_HEIGHT / 3)
     love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 30,
+        VIRTUAL_HEIGHT / 3)
+end
+--[[
+    new displayScore function to display winning points for players
+]]
+function displayScore()
+    -- draw score in the center of the screen
+    -- need to switch font to draw before actually printing
+    love.graphics.setFont(scoreFont)
+    love.graphics.print(tostring(playerScore), VIRTUAL_WIDTH / 2,
         VIRTUAL_HEIGHT / 3)
 end
