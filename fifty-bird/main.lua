@@ -17,6 +17,12 @@
 -- virtual resolution handling library
 push = require 'push'
 
+-- classic OOP class library
+Class = require 'class'
+
+-- bird class we've written
+require 'Bird'
+
 -- physical screen dimensions
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -40,6 +46,9 @@ local GROUND_SCROLL_SPEED = 60
 -- point at which we should loop our background back to X 0
 local BACKGROUND_LOOPING_POINT = 413
 
+-- our bird sprite
+local bird = Bird()
+
 function love.load()
     -- initialize our nearest-neighbor filter for less blurry effect
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -55,15 +64,16 @@ function love.load()
     })
 end
 
+function love.resize(w, h)
+    push:resize(w, h)
+end
+
 function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     end
 end
 
-function love.resize(w,  h)
-    push:resize(w, h)
-end
 function love.update(dt)
     -- scroll background by preset speed * dt, looping back to 0 after the looping point
     backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt)
@@ -88,6 +98,9 @@ function love.draw()
     -- draw the ground on top of the background, toward the bottom of the screen
     -- at its negative looping point
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)  -- 16 is the height of the ground image
+
+    -- render our bird to the screen using its own render logic
+    bird:render()
 
     push:finish()
 end
