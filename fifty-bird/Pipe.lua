@@ -19,14 +19,14 @@ local PIPE_IMAGE = love.graphics.newImage('images/pipe.png')
 PIPE_SPEED = 60
 
 -- height of pipe image, globally accessible
-PIPE_HEIGHT = 288
+PIPE_HEIGHT = 430
 PIPE_WIDTH = 70
 
 function Pipe:init(orientation, y)
     self.x = VIRTUAL_WIDTH
     self.y = y
 
-    self.width = PIPE_IMAGE:getWidth()
+    self.width = PIPE_WIDTH
     self.height = PIPE_HEIGHT
 
     self.orientation = orientation
