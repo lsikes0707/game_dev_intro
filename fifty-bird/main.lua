@@ -2,6 +2,9 @@
     GD50 2023
     Flappy Bird Remake
 
+    bird3
+    "The Gavity Update"
+
     Author: Lacey Gruwell
     gruwell.lacey@gmail.com
 
@@ -82,6 +85,8 @@ function love.update(dt)
     -- scroll ground by preset speed * dt, looping to 0 after the screen width passes
     groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt)
         % VIRTUAL_WIDTH
+
+    bird:update(dt)
 end
 
 function love.draw()
