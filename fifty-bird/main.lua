@@ -2,8 +2,8 @@
     GD50 2023
     Flappy Bird Remake
 
-    bird9
-    "The Score Update"
+    bird10
+    "The Countdown Update"
 
     Author: Lacey Gruwell
     gruwell.lacey@gmail.com
@@ -35,6 +35,7 @@ require 'PipePair'
 -- all code related to game state and state machines
 require 'StateMachine'
 require 'states/BaseState'
+require 'states/CountdownState'
 require 'states/PlayState'
 require 'states/ScoreState'
 require 'states/TitleScreenState'
@@ -95,6 +96,7 @@ function love.load()
     -- initialize state machine with all state0returning functions
     gStateMachine = StateMachine {
         ['title'] = function() return TitleScreenState() end,
+        ['countdown'] = function() return CountdownState() end,
         ['play'] = function() return PlayState() end,
         ['score'] = function() return ScoreState() end
     }
