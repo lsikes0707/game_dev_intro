@@ -2,8 +2,8 @@
     GD50 2023
     Flappy Bird Remake
 
-    bird10
-    "The Countdown Update"
+    bird11
+    "The Audio Update"
 
     Author: Lacey Gruwell
     gruwell.lacey@gmail.com
@@ -17,28 +17,33 @@
     as an infinitely generated obstacle course for the player.
 ]]
 
--- virtual resolution handling library
+-- push is a library that will allow us to draw our game at a virtual
+-- resolution, instead of however large our window is; used to provide
+-- a more retro aesthetic
+--
+-- https://github.com/Ulydev/push
 push = require 'push'
 
--- classic OOP class library
+-- the "Class" library we're using will allow us to represent anything in
+-- our game as code, rather than keeping track of many disparate variables and
+-- methods
+--
+-- https://github.com/vrld/hump/blob/master/class.lua
 Class = require 'class'
 
--- bird class we've written
-require 'Bird'
-
--- pipe class we've written
-require 'Pipe'
-
--- class representing pair of pipes together
-require 'PipePair'
-
--- all code related to game state and state machines
+-- a basic StateMachine class which will allow us to transition to and from
+-- game states smoothly and avoid monolithic code in one file
 require 'StateMachine'
+
 require 'states/BaseState'
 require 'states/CountdownState'
 require 'states/PlayState'
 require 'states/ScoreState'
 require 'states/TitleScreenState'
+    
+require 'Bird'  -- bird class we've written
+require 'Pipe'  -- pipe class we've written
+require 'PipePair'  -- class representing pair of pipes together
 
 -- physical screen dimensions
 WINDOW_WIDTH = 1280
@@ -48,26 +53,19 @@ WINDOW_HEIGHT = 720
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
 
--- background image and starting scroll location (X axis)
-local background = love.graphics.newImage('images/background.png')
-local backgroundScroll = 0
+local background = love.graphics.newImage('images/background.png')  -- background image
+local backgroundScroll = 0  -- starting scroll location (X axis)
 
--- ground image and starting scroll location (X axis)
-local ground = love.graphics.newImage('images/ground.png')
-local groundScroll = 0
+local ground = love.graphics.newImage('images/ground.png')  -- ground image
+local groundScroll = 0  -- starting scroll location (X axis)
 
--- speed at which we should scroll our images, scaled by dt
-local BACKGROUND_SCROLL_SPEED = 30
-local GROUND_SCROLL_SPEED = 60
+local BACKGROUND_SCROLL_SPEED = 30  -- speed at which we should scroll our images
+local GROUND_SCROLL_SPEED = 60  -- scaled by dt
 
--- point at which we should loop our background back to X 0
-local BACKGROUND_LOOPING_POINT = 413
+local BACKGROUND_LOOPING_POINT = 413    -- point at which we should scroll our images
 
--- point at which we should loop our ground back to X 0
-local GROUND_LOOPING_POINT = 514
-
--- scrolling variable to pause the game when we collide with a pipe
-local scrolling = true
+-- global variable we can use to scroll the map
+scrolling = true
 
 function love.load()
     -- initialize our nearest-neighbor filter for less blurry effect
@@ -85,6 +83,21 @@ function love.load()
     flappyFont = love.graphics.newFont('flappy.ttf', 28)
     hugeFont = love.graphics.newFont('flappy.ttf', 56)
     love.graphics.setFont(flappyFont)
+
+    -- initialize our table of sounds
+    sounds = {
+        ['jump'] = love.audio.newSource('sounds/jump.wav', 'static'),
+        ['explosion'] = love.audio.newSource('sounds/explosion.wav', 'static'),
+        ['hurt'] = love.audio.newSource('sounds/hurt.wav', 'static'),
+        ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
+
+        -- https://freesound/org/people/xsgianni/sounds/388079/
+        ['music'] = love.audio.newSource('sounds/marios_way.mp3', 'static'), 
+    }
+
+    -- kick off music
+    sounds['music']:setLooping(true)
+    sounds['music']:play()
 
     -- initialize our virtual resolution
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
@@ -119,10 +132,6 @@ function love.keypressed(key)
     end
 end
 
---[[
-    New function used to check our global input table for keys we activated during
-    this frame, loked up by their string value
-]]
 function love.keyboard.wasPressed(key)
     if love.keyboard.keysPressed[key] then
         return true
@@ -132,23 +141,19 @@ function love.keyboard.wasPressed(key)
 end
 
 function love.update(dt)
-    -- update background and ground scroll offsets
-    backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt)
-        % BACKGROUND_LOOPING_POINT
-    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
+    if scrolling then
+        backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
+        groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
+    end
 
-    -- now, we just update the state machine, which defers to the right state
-    gStateMachine:update(dt)
+    gStateMachine:update(dt)    -- update the state machine which defers to the right state
 
-    -- reset input table
-    love.keyboard.keysPressed = {}
+    love.keyboard.keysPressed = {}  -- reset input table
 end
 
 function love.draw()
     push:start()
 
-    -- draw state machine between the background and ground, which defers
-    -- render logic to the currently active state
     love.graphics.draw(background, -backgroundScroll, 0)
     gStateMachine:render()
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)  -- 16 is the height of the ground image
