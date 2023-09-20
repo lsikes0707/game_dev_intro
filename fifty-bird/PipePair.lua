@@ -10,8 +10,8 @@
 
 PipePair = Class{}
 
--- size of the gap between pipes
-local GAP_HEIGHT = 90   -- randomize 90 as part of the homework assignment
+-- size of the gap between pipes    -- moved into init function and randomized
+-- local GAP_HEIGHT = 90   -- randomize 90 as part of the homework assignment
 
 function PipePair:init(y)
     -- initialize pipes pas the end of the screen
@@ -21,6 +21,8 @@ function PipePair:init(y)
     self.y = y
     
     -- instantiate two pipes that belong to this pair
+
+    local GAP_HEIGHT = math.random(75, 100)
     self.pipes = {
         ['upper'] = Pipe('top', self.y),
         ['lower'] = Pipe('bottom', self.y + PIPE_HEIGHT + GAP_HEIGHT)
