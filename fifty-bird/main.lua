@@ -2,11 +2,14 @@
     GD50 2023
     Flappy Bird Remake
 
-    bird11
-    "The Audio Update"
-
     Author: Lacey Gruwell
     gruwell.lacey@gmail.com
+
+    reference https://github.com/xmarcos/fifty-bird
+    to learn to pause, add medals based on score, etc from the homework assignment
+
+    maybe then you can add in lettered bugs/fruit for flappy to eat and extend time...
+    after adding a timer, too
 
     A mobile game by Dong Nguyen that went viral in 2013, utilizing a very simple
     but effective gameplay mechanic of avoiding pipes indefinitely by just tapping
@@ -38,6 +41,8 @@ require 'StateMachine'
 require 'states/BaseState'
 require 'states/CountdownState'
 require 'states/PlayState'
+require 'states/PauseState'
+require 'states/TitleScreenState'
 require 'states/ScoreState'
 require 'states/TitleScreenState'
     
@@ -52,6 +57,8 @@ WINDOW_HEIGHT = 720
 -- virtual resoltion dimensions
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
+
+GAME_PAUSED = false -- starting pause feature pause disabled
 
 local background = love.graphics.newImage('images/background.png')  -- background image
 local backgroundScroll = 0  -- starting scroll location (X axis)
@@ -90,6 +97,7 @@ function love.load()
         ['explosion'] = love.audio.newSource('sounds/explosion.wav', 'static'),
         ['hurt'] = love.audio.newSource('sounds/hurt.wav', 'static'),
         ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
+        ['pause'] = love.audio.newSource('sounds/pause.wav', 'static'),
 
         -- https://freesound/org/people/xsgianni/sounds/388079/
         ['music'] = love.audio.newSource('sounds/marios_way.mp3', 'static'), 
@@ -111,6 +119,7 @@ function love.load()
         ['title'] = function() return TitleScreenState() end,
         ['countdown'] = function() return CountdownState() end,
         ['play'] = function() return PlayState() end,
+        ['pause'] = function() return PauseState() end,
         ['score'] = function() return ScoreState() end
     }
     gStateMachine:change('title')

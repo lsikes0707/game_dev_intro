@@ -14,6 +14,10 @@ PipePair = Class{}
 -- local GAP_HEIGHT = 90   -- randomize 90 as part of the homework assignment
 
 function PipePair:init(y)
+    -- flag to hold whether this pair has been scored (jumped through)
+    self.scored = false
+    -- vertical space between the two pipes
+
     -- initialize pipes pas the end of the screen
     self.x = VIRTUAL_WIDTH + 32
 
@@ -31,10 +35,18 @@ function PipePair:init(y)
     -- whether this pipe pair is ready to be removed from the scene
     self.remove = false
 end
+--[[
+function PipePair:getCurrentX()
+    return self.x
+end
 
+function PipePair:getRandomGapHeight()
+    return math.random(GAP_MIN_HEIGHT, GAP_MAX_HEIGHT)
+end
+]]
 function PipePair:update(dt)
     -- remove the pipe from the scene if it's beyond the left edge of the screen,
-    -- else move itt from right to left
+    -- else move it from right to left
     if self.x > -PIPE_WIDTH then
         self.x = self.x - PIPE_SPEED * dt
         self.pipes['lower'].x = self.x

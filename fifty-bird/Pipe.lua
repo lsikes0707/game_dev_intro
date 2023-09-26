@@ -14,6 +14,7 @@ Pipe = Class{}
 
 -- since we only want the image loaded once, not per instantation, define it externally
 local PIPE_IMAGE = love.graphics.newImage('images/pipe.png')
+PIPE_IMAGE:setFilter('nearest', 'nearest')
 
 -- speed at which the pipe should scroll right to left
 PIPE_SPEED = 60

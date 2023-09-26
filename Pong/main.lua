@@ -148,7 +148,7 @@ function love.update(dt)
             playerScore = playerScore + 1
 
             -- if players vollied to 26 - they win!
-            if playerScore == 26 then
+            if playerScore == 5 then
                 gameState = 'done'
                 ball:reset()
             end
@@ -167,7 +167,7 @@ function love.update(dt)
             sounds['paddle_hit']:play()
             playerScore = playerScore + 1
             -- if players vollied to 26 - they win!
-            if playerScore == 26 then
+            if playerScore == 5 then --26 then
                 gameState = 'done'
                 ball:reset()
             end
@@ -319,8 +319,9 @@ function love.draw()
   
   if gameState == 'start' then
     love.graphics.setFont(smallFont)
-    love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
-    love.graphics.printf('Press Enter to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Welcome to Pong-Volley Edition!', 0, 10, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Team up to make it to 5 points!', 0, 20, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press Enter to begin!', 0, 30, VIRTUAL_WIDTH, 'center')
   elseif gameState == 'serve' then
     love.graphics.setFont(smallFont)
     love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
