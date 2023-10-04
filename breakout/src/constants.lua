@@ -1,11 +1,11 @@
 --[[
-    GD50 2018
+    GD50 2023
     Breakout Remake
 
     -- constants --
 
-    Author: Colton Ogden
-    cogden@cs50.harvard.edu
+    Author: Lacey Gruwell
+    gruwell.lacey
 
     Some global constants for our application.
 ]]
@@ -17,3 +17,6 @@ WINDOW_HEIGHT = 720
 -- size we're trying to emulate with push
 VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
+
+-- paddle movement speed
+PADDLE_SPEED = 200
